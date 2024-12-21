@@ -1,0 +1,62 @@
+!kaggle datasets download ankitbansal06/retail-orders -f orders.csv
+
+!unzip orders.csv.zip
+
+
+import pandas as pd
+
+df=pd.read_csv("/content/orders.csv")
+
+df1=df.copy()
+
+df["Order Date"]=pd.to_datetime(df["Order Date"],format="%Y-%m-%d")
+
+df.columns=df.columns.str.replace(" ","_")
+
+df.rename(columns=str.lower, inplace=True)
+
+df["ship_mode"].unique()
+
+df["ship_mode"]=df["ship_mode"].apply(lambda i: "Not Available" if i=="unknown" else i)
+
+df["ship_mode"] = df["ship_mode"].fillna("Not Available")
+
+df = df.apply(lambda i: i.str.rstrip() if i.dtype == "object" else i)
+
+df["discount_price"]=df["list_price"] * (df["discount_percent"]/100)
+
+df["sale_price"]=(df["list_price"] - df["discount_price"]) * df["quantity"]
+
+df["profit"]=df["sale_price"] - (df["cost_price"]*df["quantity"])
+
+df["order_year"]=df["order_date"].dt.year
+df["order_month"]=df["order_date"].dt.month
+
+pip install psycopg2
+
+import psycopg2
+
+from sqlalchemy import create_engine
+
+
+client=psycopg2.connect(host="haridb.c5wy6wg8kqs5.ap-south-1.rds.amazonaws.com",user="postgre",password="Root1996",port="5432",database="postgres")
+
+# Database connection parameters
+host = "haridb.c5wy6wg8kqs5.ap-south-1.rds.amazonaws.com"           # e.g., 'localhost' or an IP address
+port = "5432"           # Default PostgreSQL port is 5432
+database = "postgres"   # Name of your database
+user = "postgres"           # Database user
+password = "Root1996"   # Database password
+
+# Create a connection string
+connection_string = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}"
+
+
+# Create a SQLAlchemy engine
+engine = create_engine(connection_string)
+
+
+# Write the DataFrame to a table in PostgreSQL
+table_name = "retail_order"  # Specify the name of the table
+df.to_sql(table_name, con=engine, if_exists="replace", index=False)
+print("DataFrame written to PostgreSQL successfully!")
