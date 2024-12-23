@@ -36,7 +36,7 @@ def run_query(query):
 
 # Home Page
 def Retail_order():
-    st.title("Retail_order_data Bussiness-In-Site")
+    st.title("Retail_order_data Bussiness-Insights")
     st.write("By Hariprasath S")
     queries = {
         
