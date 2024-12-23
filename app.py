@@ -266,6 +266,7 @@ def write_query():
         
         except Exception as e:
             st.error(f"An error occurred: {e}")
+    st.image("https://raw.githubusercontent.com/Hariprasath1911/Guvi_Project1/main/ER%20diagram-sql.png")
 
 # Dropdown for navigation
 page = st.sidebar.selectbox("Select a page", ["Retail_order", "Query", "My_Query","write_query"])
